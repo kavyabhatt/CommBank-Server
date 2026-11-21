@@ -19,16 +19,24 @@ public class FakeGoalsService : IGoalsService
         await Task.FromResult(_goals);
 
     public async Task<List<Goal>?> GetForUserAsync(string id) =>
-        await Task.FromResult(_goals);
+        await Task.FromResult(_goals.Where(goal => goal.UserId == id).ToList());
 
     public async Task<Goal?> GetAsync(string id) =>
-        await Task.FromResult(_goal);
+        await Task.FromResult(_goals.FirstOrDefault(goal => goal.Id == id) ?? _goal);
 
     public async Task CreateAsync(Goal newGoal) =>
         await Task.FromResult(true);
 
-    public async Task UpdateAsync(string id, Goal updatedGoal) =>
-        await Task.FromResult(true);
+    public async Task UpdateAsync(string id, Goal updatedGoal)
+    {
+        var goalIndex = _goals.FindIndex(goal => goal.Id == id);
+        if (goalIndex >= 0)
+        {
+            _goals[goalIndex] = updatedGoal;
+        }
+
+        await Task.CompletedTask;
+    }
 
     public async Task RemoveAsync(string id) =>
         await Task.FromResult(true);
